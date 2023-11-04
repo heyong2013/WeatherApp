@@ -1,2 +1,2 @@
-# AIMoments
-this is a interesting project.
+# WeatherApp 天气APP
+这是一个天气app，可以查看全国各地的天气情况，包括实时天气、未来天气、生活指数、空气质量、天气预警等信息。
