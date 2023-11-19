@@ -4,6 +4,9 @@ plugins {
 }
 
 android {
+    viewBinding {
+        enable = true
+    }
     namespace = "com.example.weather"
     compileSdk = 33
 
