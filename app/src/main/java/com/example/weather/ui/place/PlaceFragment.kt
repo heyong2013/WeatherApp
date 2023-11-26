@@ -18,7 +18,7 @@ import com.example.weather.databinding.FragmentPlaceBinding
 
 class PlaceFragment: Fragment() {
 
-    private val viewModel by lazy { ViewModelProvider(this)[PlaceViewModel::class.java] }
+    val viewModel by lazy { ViewModelProvider(this)[PlaceViewModel::class.java] }
 
     private lateinit var adapter: PlaceAdapter
 

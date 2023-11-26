@@ -1,14 +1,18 @@
 package com.example.weather
 
+import android.content.Context
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.weather.databinding.ActivityWeatherBinding
@@ -20,15 +24,37 @@ import java.util.Locale
 
 class WeatherActivity : BaseActivity() {
     val TAG = "WeatherActivity"
-    private val viewModel by lazy { ViewModelProvider(this)[WeatherViewModel::class.java] }
-    private lateinit var binding: ActivityWeatherBinding
+    val viewModel by lazy { ViewModelProvider(this)[WeatherViewModel::class.java] }
+    lateinit var binding: ActivityWeatherBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate: ")
+
         binding = ActivityWeatherBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+        binding.now.navBtn.setOnClickListener {
+            binding.drawerLayout.openDrawer(GravityCompat.START)
+        }
+        binding.drawerLayout.addDrawerListener(object : DrawerListener{
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                Log.d(TAG, "onDrawerSlide: ")
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+                Log.d(TAG, "onDrawerOpened: ")
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                Log.d(TAG, "onDrawerClosed: ")
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+                val manager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                manager.hideSoftInputFromWindow(binding.drawerLayout.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+            }
+
+        })
         if (viewModel.locationLat.isEmpty()) {
             viewModel.locationLat = intent.getStringExtra("location_lat") ?: ""
         }
@@ -48,8 +74,18 @@ class WeatherActivity : BaseActivity() {
                 Toast.makeText(this, "无法成功获取天气信息", Toast.LENGTH_SHORT).show()
                 result.exceptionOrNull()?.printStackTrace()
             }
+            binding.swipeRefresh.isRefreshing = false
         })
+        binding.swipeRefresh.setColorSchemeResources(R.color.colorPrimary)
+        refreshWeather()
+        binding.swipeRefresh.setOnRefreshListener {
+            refreshWeather()
+        }
+    }
+
+    fun refreshWeather() {
         viewModel.refreshWeather(viewModel.locationLng, viewModel.locationLat)
+        binding.swipeRefresh.isRefreshing = true
     }
 
     private fun showWeatherInfo(weather: Weather) {
