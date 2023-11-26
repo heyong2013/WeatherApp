@@ -1,6 +1,7 @@
 package com.example.weather.logic
 
 import androidx.lifecycle.liveData
+import com.example.weather.logic.dao.PlaceDao
 import com.example.weather.logic.model.Place
 import com.example.weather.logic.model.Weather
 import com.example.weather.logic.network.SunnyWeatherNetwork
@@ -19,6 +20,12 @@ object Repository {
             Result.failure(RuntimeException("response status is ${placeResponse.status}"))
         }
     }
+
+    fun savePlace(place: Place) = PlaceDao.savePlace(place)
+
+    fun getSavedPlace() = PlaceDao.getSavedPlace()
+
+    fun isPlaceSaved() = PlaceDao.isPlaceSaved()
 
     fun refreshWeather(lng: String, lat: String) = fire(Dispatchers.IO) {
         coroutineScope {
